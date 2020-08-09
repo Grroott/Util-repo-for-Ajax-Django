@@ -1,13 +1,48 @@
-<a href="{% url 'title' title.pk %}"><p>{{ title }}</p></a>
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<div class="section">
+		<a href="{% url 'title' title.pk  %}"><p>{{ title }}</p></a>
+
+		<!-- <p>{{ request.user }}</p> -->
+
+		{% if is_booked %}
+			<a id='book' value='{{ title.pk }}' href="{% url 'booked' title.pk %}">Remove</a>
+		{% else %}
+			<a id='book' value='{{ title.pk }}' href="{% url 'booked' title.pk %}">Add</a>
+		{% endif %}
+
+		<p>{{ cou }}</p>
+
+		<br><br><br>
+		<a href="{% url 'home' %}">Return to home page</a>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 
 
-<p>{{ request.user }}</p>
-
-{% if is_booked %}
-	<a href="{% url 'booked' title.pk %}">Remove</a>
-{% else %}
-	<a href="{% url 'booked' title.pk %}">Add</a>
-{% endif %}
-
-<br><br><br>
-<a href="{% url 'home' %}">Return to home page</a>
+	<script type="text/javascript">
+		$(document).ready(function(event){
+			$(document).on('click', '#book', function(event){
+				event.preventDefault();
+				var url = '{% url 'booked' title.pk %}';
+				var pk = $(this).attr('value');
+                $.ajax({
+                    type : 'POST',
+                    url : url,
+                    data : {'id' : pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, 
+                    dataType : 'json',
+                    success : function(response){
+                    	$(".section").load(" .section")
+                    },
+                    error : function(rs, e){
+                        console.log(rs.responseText); 
+                    },
+                });
+            });
+        });
+    </script>
+</body>
+</html>

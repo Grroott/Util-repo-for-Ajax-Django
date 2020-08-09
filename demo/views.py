@@ -1,18 +1,34 @@
 from django.shortcuts import render
 from .models import Demo
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 # Create your views here.
 def booked(request, pk):
-	titles = Demo.objects.get(id=pk)
+	title = Demo.objects.get(id=pk)
+
+	is_booked = False
+	if title.booked.filter(id=request.user.id).exists():
+		is_booked = True
+	
 
 
-	if titles.booked.filter(id=request.user.id).exists():
-		titles.booked.remove(request.user)
+	if title.booked.filter(id=request.user.id).exists():
+		title.booked.remove(request.user)
 	else:
-		titles.booked.add(request.user)
-	return redirect('home')
+		title.booked.add(request.user)
+	# return redirect('home')
 
+	cou = title.booked.count()
+
+	if request.is_ajax():
+		context = {
+		'title' : title,
+		'is_booked' : is_booked,
+		'cou' : cou
+		}
+		html = render_to_string('demo/title.html', context, request=request)
+		return JsonResponse({'form': html})
 
 def home(request):
 	titles = Demo.objects.all()
@@ -26,9 +42,11 @@ def titles(request, pk):
 	is_booked = False
 	if title.booked.filter(id=request.user.id).exists():
 		is_booked = True
+	cou = title.booked.count()
 	context = {
 	'title' : title,
 	'is_booked' : is_booked,
+	'cou' : cou
 	}
 	return render(request, 'demo/title.html', context)
 
