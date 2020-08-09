@@ -1,0 +1,13 @@
+<a href="{% url 'title' title.pk %}"><p>{{ title }}</p></a>
+
+
+<p>{{ request.user }}</p>
+
+{% if is_booked %}
+	<a href="{% url 'booked' title.pk %}">Remove</a>
+{% else %}
+	<a href="{% url 'booked' title.pk %}">Add</a>
+{% endif %}
+
+<br><br><br>
+<a href="{% url 'home' %}">Return to home page</a>
